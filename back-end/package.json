@@ -6,7 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
     "start-sub": "node dist/subscriber.js",
-    "sub": "npm run build && npm run start-sub"
+    "start-api": "node dist/reader.js",
+    "sub": "npm run build && npm run start-sub",
+    "api": "npm run build && npm run start-api"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +17,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "express": "^5.1.0",
     "mongoose": "^8.13.2",
     "mqtt": "^5.10.4"
   }
