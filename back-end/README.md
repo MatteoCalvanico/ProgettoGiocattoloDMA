@@ -1,0 +1,1 @@
+Per far startare il subscriber fare: "npm run sub"
