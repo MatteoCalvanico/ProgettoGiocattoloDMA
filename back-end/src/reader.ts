@@ -13,7 +13,7 @@ mongoose.connect(mongoUrl)
 
 
 // Tutti i messaggi
-app.get('/', async (req, res) => {
+app.get('/all', async (req, res) => {
     try {
         const messages = await Message.find({});
         res.json(messages);
