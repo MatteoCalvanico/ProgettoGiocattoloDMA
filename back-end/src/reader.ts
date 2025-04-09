@@ -1,27 +1,25 @@
-import mongoose from "mongoose";
-import { Message } from "./model/schema";
+import Fastify from 'fastify'
+import { MongoRepo } from './repository/mongoRepo';
 
-const express = require('express')
-const app = express()
-const port = 8080
+const fastify = Fastify({
+  logger: true
+})
 
 // Connessione a MongoDB con Mongoose
 const mongoUrl = "mongodb://localhost:27017/projectOne";
-mongoose.connect(mongoUrl)
-  .then(() => console.log('Connection to MongoDB succedes'))
-  .catch(err => console.error('Errore di connessione a MongoDB:', err));
+const mongoRepo = new MongoRepo(mongoUrl);
+mongoRepo.connection();
 
-
-// Tutti i messaggi
-app.get('/all', async (req, res) => {
-    try {
-        const messages = await Message.find({});
-        res.json(messages);
-    } catch (err) {
-        res.status(500).json({ error: (err as Error).message });
-    }
+// Rotta per prendere tutti i messaggi
+fastify.get('/all', async function (request, reply) {
+  const messages = await mongoRepo.find(null);
+  reply.send({ messages })
 })
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`)
+fastify.listen({ port: 8080 }, function (err, address) {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+  fastify.log.info(`server listening on ${address}`)
 })

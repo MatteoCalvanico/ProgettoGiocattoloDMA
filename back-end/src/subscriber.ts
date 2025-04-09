@@ -1,6 +1,5 @@
 import mqtt from "mqtt";
-import mongoose from "mongoose";
-import { Message } from "./model/schema";
+import { MongoRepo } from "./repository/mongoRepo";
 
 
 // Configurazione per il broker Mosquitto
@@ -11,12 +10,11 @@ const connectUrl = `ws://${host}:${port}`;
 
 // Configurazione per il DB Mongo
 const mongoUrl = "mongodb://localhost:27017/projectOne";
+const mongoRepo = new MongoRepo(mongoUrl);
 
 
 // Connessione a MongoDB con Mongoose
-mongoose.connect(mongoUrl)
-  .then(() => console.log('Connection to MongoDB succedes'))
-  .catch(err => console.error('Errore di connessione a MongoDB:', err));
+mongoRepo.connection();
 
 // Connsessione a Mosquitto con MQTT.js
 const client = mqtt.connect(connectUrl, {
@@ -43,12 +41,7 @@ client.on('message', async function(topic, message) {
     console.log('Message:', message.toString());
 
     try {
-        const newMsg = new Message({
-            topic: topic,
-            payload: message.toString()
-        });
-
-        await newMsg.save();
+        await mongoRepo.save(topic, message.toString());
     } catch (error) {
         console.log('Errore in scrittura:', error)
     }
