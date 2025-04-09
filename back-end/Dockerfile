@@ -6,8 +6,6 @@ COPY package*.json ./
 RUN npm i
 COPY . .
 
-# Porta per il reader
+# Porta per il reader e fa partire il tutto
 EXPOSE 8080
-
-# 'concurrently' li fa partire insieme
-CMD ["concurrently", "npm run sub", "npm run api"]
+CMD npm run sub & npm run api
