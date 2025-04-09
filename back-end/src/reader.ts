@@ -1,5 +1,5 @@
 import Fastify from 'fastify'
-import { MongoRepo } from './repository/mongoRepo';
+import { MongoRepo } from './repository/mongoRepository';
 
 const fastify = Fastify({
   logger: true
@@ -8,7 +8,6 @@ const fastify = Fastify({
 // Connessione a MongoDB con Mongoose
 const mongoUrl = "mongodb://localhost:27017/projectOne";
 const mongoRepo = new MongoRepo(mongoUrl);
-mongoRepo.connection();
 
 // Rotta per prendere tutti i messaggi
 fastify.get('/all', async function (request, reply) {

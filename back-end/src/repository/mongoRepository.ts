@@ -1,17 +1,10 @@
-// Questa classe servirà per la gestione di tutto ciò che riguarda mongo
-
+// Questa classe servirà per la gestione di MongoDB
 import mongoose from "mongoose";
 import { Message } from "../model/schema";
 
 export class MongoRepo {
-    url: string;
-
     constructor(mongoUrl: string) {
-        this.url = mongoUrl;
-    }
-
-    connection() {
-        mongoose.connect(this.url)
+        mongoose.connect(mongoUrl)
             .then(() => console.log('Connection to MongoDB succedes'))
             .catch(err => console.error('Errore di connessione a MongoDB:', err));
     }
@@ -29,7 +22,7 @@ export class MongoRepo {
      * Trova i valori all'interno del db
      * @param param Parametri su cui cercare, lasciare null se si necessità di ottenere tutti i messaggi
      */
-    async find(param: Object) {
+    async find(param: Object | null) {
         console.log('Searching...')
         if (param == null) {
             const results = await Message.find({});
