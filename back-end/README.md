@@ -1,2 +1,3 @@
-Per far startare il subscriber fare: "npm run sub".
-Per far startare il reader che espone le api fare: "npm run api".
+Scarica le dipendenze con "npm i", successivamente è possibile:
+- far startare il subscriber fare: "npm run sub".
+- far startare il reader che espone le api fare: "npm run api".
