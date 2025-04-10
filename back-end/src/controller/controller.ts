@@ -12,7 +12,7 @@ export class controller {
         try {
             const messages = await this.mongoRepository.find(null);
             reply.send({ messages })
-        } catch (error) {
+        } catch (error: any) {
             reply.code(500).send({ success: false, error: error.message });
         }
     }
