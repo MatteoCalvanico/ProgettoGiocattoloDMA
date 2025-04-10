@@ -33,4 +33,11 @@ export class mongoRepo {
         console.log('Find');
         return results;
     }
+
+    async findByTimestamp(stamp: string) {
+        console.log('Searching...')
+        const results = await Message.find({timestamp: stamp})
+        console.log('Find');
+        return results
+    }
 }

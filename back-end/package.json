@@ -19,6 +19,7 @@
   "dependencies": {
     "fastify": "^5.2.2",
     "mongoose": "^8.13.2",
-    "mqtt": "^5.10.4"
+    "mqtt": "^5.10.4",
+    "zod": "^3.24.2"
   }
 }
