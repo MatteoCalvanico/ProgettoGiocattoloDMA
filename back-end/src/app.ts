@@ -14,7 +14,7 @@ const mongoRepository = new mongoRepo(mongoUrl);
 const c = new controller(mongoRepository);
 
 // Rotta per prendere tutti i messaggi
-fastify.get('/all', c.findAll)
+fastify.get('/all', (req, reply) => c.findAll(req, reply))
 
 // Listener per request
 fastify.listen({ port: 8080 }, function (err, address) {
