@@ -8,7 +8,7 @@
     "start-sub": "node dist/subscriber.js",
     "start-api": "node dist/app.js",
     "sub": "npm run build && npm run start-sub",
-    "api": "npm run build && npm run start-api"
+    "app": "npm run build && npm run start-api"
   },
   "author": "",
   "license": "ISC",
