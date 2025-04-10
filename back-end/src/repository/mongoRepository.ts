@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import { Message } from "../model/schema";
 
-export class MongoRepo {
+export class mongoRepo {
     constructor(mongoUrl: string) {
         mongoose.connect(mongoUrl)
             .then(() => console.log('Connection to MongoDB succedes'))

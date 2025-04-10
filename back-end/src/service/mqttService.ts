@@ -1,18 +1,18 @@
 // Questa classe servirà per la gestione di MQTT
 import mqtt from "mqtt";
-import { MongoRepo } from "../repository/mongoRepository";
+import { mongoRepo } from "../repository/mongoRepository";
 
 export class mqttService {
     client: mqtt.MqttClient
 
-    host: string = 'localhost';
-    socketPort: string = '9001'; // WebSocket
-    mqttPort: string = '1885';
+    private host: string = 'localhost';
+    private socketPort: string = '9001'; // WebSocket
+    private mqttPort: string = '1885';
 
-    socketConnectUrl: string = `ws://${this.host}:${this.socketPort}`;
-    mqttConnectUrl: string = `mqtt://${this.host}:${this.mqttPort}`;
+    private socketConnectUrl: string = `ws://${this.host}:${this.socketPort}`;
+    private mqttConnectUrl: string = `mqtt://${this.host}:${this.mqttPort}`;
 
-    clientId: string = `mqtt_${Math.random().toString(16).slice(3)}`;
+    private clientId: string = `mqtt_${Math.random().toString(16).slice(3)}`;
 
 
     constructor(withSocket: boolean) {
@@ -36,7 +36,7 @@ export class mqttService {
         });
     }
 
-    save(mongo: MongoRepo) {
+    save(mongo: mongoRepo) {
         // Legge continuamente da subscriber e salva in MongoDB
         if(this.client.connected) {
             this.client.on('message', async (topic, message) => {
