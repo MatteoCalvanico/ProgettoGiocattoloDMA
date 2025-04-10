@@ -21,3 +21,4 @@ This project aims to simulate a full stack application with a level architecture
 - Mongoose: used for MongoDB interactions.
 - Fortification: used for endpoints.
 - Mqtt.js: used for Mosquitto interactions.
+- Zod: used for validate endpoint params.
