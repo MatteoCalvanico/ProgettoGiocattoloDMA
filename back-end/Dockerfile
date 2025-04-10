@@ -8,4 +8,4 @@ COPY . .
 
 # Porta per il reader e fa partire il tutto
 EXPOSE 8080
-CMD npm run sub & npm run api
+CMD npm run sub & npm run app
