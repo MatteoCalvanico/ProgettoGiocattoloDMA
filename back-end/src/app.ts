@@ -18,7 +18,7 @@ const c = new controller(mongoRepository);
 fastify.get('/all', (req, reply) => c.findAll(req, reply))
 
 // Listener per request
-fastify.listen({ port: 8080 }, function (err, address) {
+fastify.listen({ port: 8080, host: '0.0.0.0' }, function (err, address) {
   if (err) {
     fastify.log.error(err)
     process.exit(1)
