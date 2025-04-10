@@ -1,5 +1,6 @@
 import Fastify from 'fastify'
-import { MongoRepo } from './repository/mongoRepository';
+import { mongoRepo } from './repository/mongoRepository';
+import { controller } from './controller/controller';
 
 const fastify = Fastify({
   logger: true
@@ -7,14 +8,15 @@ const fastify = Fastify({
 
 // Connessione a MongoDB con Mongoose
 const mongoUrl = "mongodb://localhost:27017/projectOne";
-const mongoRepo = new MongoRepo(mongoUrl);
+const mongoRepository = new mongoRepo(mongoUrl);
+
+// Inizializzazione controller
+const c = new controller(mongoRepository);
 
 // Rotta per prendere tutti i messaggi
-fastify.get('/all', async function (request, reply) {
-  const messages = await mongoRepo.find(null);
-  reply.send({ messages })
-})
+fastify.get('/all', c.findAll)
 
+// Listener per request
 fastify.listen({ port: 8080 }, function (err, address) {
   if (err) {
     fastify.log.error(err)
