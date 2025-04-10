@@ -7,9 +7,9 @@ const fastify = Fastify({
 })
 
 // Connessione a MongoDB con Mongoose
-const mongoUrl = "mongodb://localhost:27017/projectOne";
+//const mongoUrl = "mongodb://localhost:27017/projectOne";
+const mongoUrl = process.env.MONGO_URL || "mongodb://localhost:27017/projectOne";
 const mongoRepository = new mongoRepo(mongoUrl);
-// const mongoUrl = process.env.MONGO_URL || "mongodb://localhost:27017/projectOne";
 
 // Inizializzazione controller
 const c = new controller(mongoRepository);
