@@ -3,6 +3,7 @@ import { mqttService } from "./service/mqttService";
 
 // Configurazione per il DB Mongo
 const mongoUrl = "mongodb://localhost:27017/projectOne";
+// const mongoUrl = process.env.MONGO_URL || "mongodb://localhost:27017/projectOne";
 const mongoRepository = new mongoRepo(mongoUrl);
 
 // Configurazione per il broker Mosquitto

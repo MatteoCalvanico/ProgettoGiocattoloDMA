@@ -5,9 +5,14 @@ import { mongoRepo } from "../repository/mongoRepository";
 export class mqttService {
     client: mqtt.MqttClient
 
+    /*
     private host: string = 'localhost';
     private socketPort: string = '9001'; // WebSocket
     private mqttPort: string = '1885';
+    */
+    private host: string = process.env.MQTT_HOST || 'localhost';
+    private socketPort: string = process.env.MQTT_WS_PORT || '9001';
+    private mqttPort: string = process.env.MQTT_PORT || '1885';
 
     private socketConnectUrl: string = `ws://${this.host}:${this.socketPort}`;
     private mqttConnectUrl: string = `mqtt://${this.host}:${this.mqttPort}`;

@@ -1,0 +1,77 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - "1885:1883"  # MQTT
+      - "9001:9001"  # WebSockets
+    volumes:
+      - mosquitto_config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    restart: unless-stopped
+    networks:
+      - app_network
+    command: >
+      sh -c "echo 'listener 1883' > /mosquitto/config/mosquitto.conf &&
+             echo 'allow_anonymous true' >> /mosquitto/config/mosquitto.conf &&
+             echo 'listener 9001' >> /mosquitto/config/mosquitto.conf &&
+             echo 'protocol websockets' >> /mosquitto/config/mosquitto.conf &&
+             mosquitto -c /mosquitto/config/mosquitto.conf"
+
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - mosquitto
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/projectOne
+      - MQTT_HOST=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_WS_PORT=9001
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app_network
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+      - REACT_APP_MQTT_HOST=mosquitto
+      - REACT_APP_MQTT_PORT=9001
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  mosquitto_config:
+  mosquitto_data:
+  mosquitto_log:
