@@ -30,7 +30,7 @@ export class mqttService {
     connect(topic: string) {
         console.log("Connection...")
         this.client.on('connect', () => {
-            this.client.subscribe(topic, (err) => {
+            this.client.subscribe(topic, { qos: 2 }, (err) => {
                 if (!err) {
                     console.log(`Subscribed to '${topic}'`);
                 }
