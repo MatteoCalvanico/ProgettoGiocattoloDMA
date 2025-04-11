@@ -8,20 +8,20 @@ function App() {
   const [messageStatus, setMessageStatus] = useState('');
 
   function sendData() {
-    console.log('Button clicked');
-
-    // Configurazione per il broker Mosquitto locale
-    const host = 'localhost';
-    const port = '9001';      // WebSocket
+    // Configurazione per il broker RabbitMQ locale
+    const host = process.env.REACT_APP_MQTT_HOST || 'localhost';
+    const port = process.env.REACT_APP_MQTT_PORT || '15675';
     const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 
-    const connectUrl = `ws://${host}:${port}`;
+    const connectUrl = `ws://${host}:${port}/ws`;
 
     const client = mqtt.connect(connectUrl, {
       clientId,
       clean: true,
       connectTimeout: 4000,
-      // Nessun username/password necessario (allow_anonymous true)
+      // Use consistent environment variables
+      username: process.env.REACT_APP_RABBITMQ_USER || 'guest',
+      password: process.env.REACT_APP_RABBITMQ_PASSWORD || 'guest',
       reconnectPeriod: 1000,
     });
     

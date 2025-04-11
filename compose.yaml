@@ -10,25 +10,29 @@ services:
     networks:
       - app_network
 
-  mosquitto:
-    image: eclipse-mosquitto:latest
-    container_name: mosquitto
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    #command: |
+    #  bash -c "
+    #  rabbitmq-plugins enable rabbitmq_mqtt rabbitmq_web_mqtt &&
+    #  rabbitmq-server
+    #  "
     ports:
       - "1885:1883"  # MQTT
-      - "9001:9001"  # WebSockets
+      - "5672:5672"  # AMQP
+      - "15672:15672"  # Management UI
+      - "15675:15675"  # MQTT over WebSocket
     volumes:
-      - ./mosquitto/conf:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - ./rabbitmq/data:/var/lib/rabbitmq
+      - ./rabbitmq/logs:/var/log/rabbitmq
+      - ./rabbitmq/conf:/etc/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     restart: unless-stopped
     networks:
       - app_network
-    #command: >
-    #  sh -c "echo 'listener 1883' > /mosquitto/config/mosquitto.conf &&
-    #         echo 'allow_anonymous true' >> /mosquitto/config/mosquitto.conf &&
-    #         echo 'listener 9001' >> /mosquitto/config/mosquitto.conf &&
-    #         echo 'protocol websockets' >> /mosquitto/config/mosquitto.conf &&
-    #         mosquitto -c /mosquitto/config/mosquitto.conf"
 
   backend:
     build:
@@ -39,12 +43,14 @@ services:
       - "8080:8080"
     depends_on:
       - mongodb
-      - mosquitto
+      - rabbitmq
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/projectOne
-      - MQTT_HOST=mosquitto
-      - MQTT_PORT=1883
-      - MQTT_WS_PORT=9001
+    - MONGO_URL=mongodb://mongodb:27017/projectOne
+    - MQTT_HOST=rabbitmq
+    - MQTT_PORT=1883
+    - MQTT_WS_PORT=15675
+    - RABBITMQ_USER=guest
+    - RABBITMQ_PASSWORD=guest
     restart: unless-stopped
     networks:
       - app_network
@@ -63,8 +69,10 @@ services:
       - app_network
     environment:
       - REACT_APP_API_URL=http://localhost:8080
-      - REACT_APP_MQTT_HOST=mosquitto
-      - REACT_APP_MQTT_PORT=9001
+      - REACT_APP_MQTT_HOST=localhost
+      - REACT_APP_MQTT_PORT=15675
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
 
 networks:
   app_network:
