@@ -22,6 +22,9 @@ front-end-end/dist
 mosquitto/data/
 mosquitto/log/
 
+# RabbitMQ
+rabbitmq/
+
 # misc
 .DS_Store
 .env.local
