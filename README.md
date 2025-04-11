@@ -13,12 +13,12 @@ This project aims to simulate a full stack application with a level architecture
 
 ## Technology used
 - React: used for the front end.
-- Mosquitto: used as a mqtt broker.
+- RabbitMQ: used as a mqtt broker.
 - MongoDB: used to save messages shared with mqtt.
 - Kong Gateway: used as a gateway.
 
 ### Used Lib
 - Mongoose: used for MongoDB interactions.
 - Fortification: used for endpoints.
-- Mqtt.js: used for Mosquitto interactions.
+- Mqtt.js: used for RabbitMQ interactions.
 - Zod: used for validate endpoint params.
