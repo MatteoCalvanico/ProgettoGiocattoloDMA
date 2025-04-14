@@ -6,10 +6,10 @@ export class mqttService {
     client: mqtt.MqttClient
 
     private host: string = process.env.MQTT_HOST || 'localhost';
-    private socketPort: string = process.env.MQTT_WS_PORT || '9001';
-    private mqttPort: string = process.env.MQTT_PORT || '1885';
+    private socketPort: string = process.env.MQTT_WS_PORT || '15675';
+    private mqttPort: string = process.env.MQTT_PORT || '1883';
 
-    private socketConnectUrl: string = `ws://${this.host}:${this.socketPort}`;
+    private socketConnectUrl: string = `ws://${this.host}:${this.socketPort}/ws`;
     private mqttConnectUrl: string = `mqtt://${this.host}:${this.mqttPort}`;
 
     private clientId: string = `mqtt_${Math.random().toString(16).slice(3)}`;
@@ -20,15 +20,17 @@ export class mqttService {
           clientId: this.clientId,
           clean: true,
           connectTimeout: 4000,
-          // Nessun username/password necessario (allow_anonymous true)
-          reconnectPeriod: 1000,
+          // RabbitMQ credentials
+          username: process.env.RABBITMQ_USER || 'guest',
+          password: process.env.RABBITMQ_PASSWORD || 'guest',
+          reconnectPeriod: 1000
         });
     }
 
     connect(topic: string) {
         console.log("Connection...")
         this.client.on('connect', () => {
-            this.client.subscribe(topic, (err) => {
+            this.client.subscribe(topic, { qos: 2 }, (err) => {
                 if (!err) {
                     console.log(`Subscribed to '${topic}'`);
                 }
@@ -59,7 +61,7 @@ export class mqttService {
             console.log('Message:', message.toString());
 
             try {
-                await mongo.save(topic, message.toString());
+                await mongo.saveSeries(topic, message.toString());
                 console.log('Message saved successfully');
             } catch (error) {
                 console.log('Errore in scrittura:', error);

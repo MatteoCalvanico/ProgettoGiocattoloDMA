@@ -1,6 +1,6 @@
 // Questa classe servirà per la gestione di MongoDB
 import mongoose from "mongoose";
-import { Message } from "../model/schema";
+import { Message, MessageSeries } from "../model/schema";
 
 export class mongoRepo {
     constructor(mongoUrl: string) {
@@ -18,12 +18,20 @@ export class mongoRepo {
         await newMsg.save();
     }
 
+    async saveSeries(topic: string, payload:string) {
+        const newSeries = new MessageSeries ({
+            metadata: {topic, payload}
+        })
+
+        await newSeries.save()
+    }
+
     /**
      * Trova i valori all'interno del db
      * @param param Parametri su cui cercare, lasciare null se si necessità di ottenere tutti i messaggi
      */
     async find(param: Object | null) {
-        console.log('Searching...')
+        console.log('Searching...');
         if (param == null) {
             const results = await Message.find({});
             console.log('Find');
@@ -37,6 +45,24 @@ export class mongoRepo {
     async findByTimestamp(stamp: string) {
         console.log('Searching...')
         const results = await Message.find({timestamp: stamp})
+        console.log('Find');
+        return results
+    }
+
+    async findSeries(param: Object | null) {
+        console.log('Searching...');
+        if (param == null) {
+            const results = await MessageSeries.find({});
+            console.log('Find');
+            return results;
+        }
+        const results = await MessageSeries.find(param);
+        return results;
+    }
+
+    async findSeriesByTimestamp(stamp: string) {
+        console.log('Searching...')
+        const results = await MessageSeries.find({timestamp: stamp})
         console.log('Find');
         return results
     }
