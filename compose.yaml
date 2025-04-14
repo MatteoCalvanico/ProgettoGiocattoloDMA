@@ -68,11 +68,79 @@ services:
     networks:
       - app_network
     environment:
-      - REACT_APP_API_URL=http://localhost:8080
-      - REACT_APP_MQTT_HOST=localhost
-      - REACT_APP_MQTT_PORT=15675
-      - RABBITMQ_USER=guest
-      - RABBITMQ_PASSWORD=guest
+    - REACT_APP_API_URL=http://localhost:8080
+    - REACT_APP_MQTT_HOST=localhost
+    - REACT_APP_MQTT_PORT=8000 # Kong's port
+    - REACT_APP_MQTT_PATH=/mqtt-ws
+    - RABBITMQ_USER=guest
+    - RABBITMQ_PASSWORD=guest
+  
+  # Kong services
+  kong-db:
+    image: postgres:13
+    container_name: kong-db
+    environment:
+      - POSTGRES_DB=kong
+      - POSTGRES_USER=kong
+      - POSTGRES_PASSWORD=kongpass
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    restart: unless-stopped
+    
+  kong-migrations:
+    image: kong:latest
+    container_name: kong-migrations
+    command: kong migrations bootstrap
+    depends_on:
+      - kong-db
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-db
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=kongpass
+    networks:
+      - app_network
+    restart: on-failure
+
+  kong:
+    image: kong:latest
+    container_name: kong
+    depends_on:
+      - kong-migrations
+      - kong-db
+      - rabbitmq
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-db
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=kongpass
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    ports:
+      - "8000:8000" # Kong proxy port
+      - "8001:8001" # Kong Admin API
+      - "8443:8443" # Kong proxy SSL
+      - "8444:8444" # Kong Admin API SSL
+    networks:
+      - app_network
+    restart: unless-stopped
+  
+  kong-setup:
+    image: alpine:latest
+    container_name: kong-setup
+    depends_on:
+      - kong
+    volumes:
+      - ./kong-setup.sh:/kong-setup.sh
+    command: sh -c "apk add --no-cache curl && chmod +x /kong-setup.sh && sh /kong-setup.sh"
+    networks:
+      - app_network
+    restart: on-failure
 
 networks:
   app_network:
@@ -80,3 +148,4 @@ networks:
 
 volumes:
   mongo_data:
+  kong_data:

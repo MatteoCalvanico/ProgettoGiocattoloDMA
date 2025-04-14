@@ -20,11 +20,12 @@ function App() {
 
     // Configurazione per il broker RabbitMQ locale
     const host = process.env.REACT_APP_MQTT_HOST || 'localhost';
-    const port = process.env.REACT_APP_MQTT_PORT || '15675';
+    const port = process.env.REACT_APP_MQTT_PORT || '8000';
+    const path = process.env.REACT_APP_MQTT_PATH || '/mqtt-ws';
     const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
-
-    const connectUrl = `ws://${host}:${port}/ws`;
-
+    
+    const connectUrl = `ws://${host}:${port}${path}`;
+    
     setConnectionStatus('Connessione in corso...');
     
     client = mqtt.connect(connectUrl, {
