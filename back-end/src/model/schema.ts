@@ -7,5 +7,17 @@ const messageSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now }
 });
 
-// Creazione del modello
+const messageSchemaSeries = new mongoose.Schema({
+  timestamp: { type: Date, default: Date.now },
+  metadata: { topic: String, payload: String }
+}, {
+  timeseries: {
+    timeField: 'timestamp',
+    metaField: 'metadata',
+    granularity: 'seconds'
+  }
+});
+
+// Export del modello
 export const Message = mongoose.model('Message', messageSchema);
+export const MessageSeries = mongoose.model('Message_series', messageSchemaSeries)

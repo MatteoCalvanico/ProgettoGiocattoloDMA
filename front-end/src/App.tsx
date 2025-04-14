@@ -39,8 +39,8 @@ function App() {
         } else {
           console.log("Message published successfully to topic 'projectOneData'");
           setMessageStatus('Messaggio pubblicato con successo!');
-          client.end();
-          console.log("Disconnected");
+          //client.end();
+          //console.log("Disconnected");
         }
       });
     });

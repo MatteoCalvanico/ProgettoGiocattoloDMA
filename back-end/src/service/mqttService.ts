@@ -61,7 +61,7 @@ export class mqttService {
             console.log('Message:', message.toString());
 
             try {
-                await mongo.save(topic, message.toString());
+                await mongo.saveSeries(topic, message.toString());
                 console.log('Message saved successfully');
             } catch (error) {
                 console.log('Errore in scrittura:', error);
