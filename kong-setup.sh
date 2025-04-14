@@ -14,6 +14,7 @@ echo "Removing any existing services..."
 curl -s -X DELETE http://kong:8001/services/rabbitmq-ws
 sleep 1
 
+## INIT RabbitMQ config
 # Create a service for RabbitMQ WebSocket
 echo "Creating RabbitMQ WebSocket service..."
 curl -i -X POST http://kong:8001/services \
@@ -27,5 +28,22 @@ curl -i -X POST http://kong:8001/services/rabbitmq-ws/routes \
   --data "protocols[]=http" \
   --data "protocols[]=https" \
   --data name=rabbitmq-ws-route
+## FINISH RabbitMQ config
+
+## INIT Back-end Endpoint config
+# Create a service for back-end endpoints
+echo "Creating endpoints service..."
+curl -i -X POST http://kong:8001/services \
+  --data name=endpoints \
+  --data url=http://backend:8080
+
+# Add a route
+echo "Creating route to the service..."
+curl -i -X POST http://kong:8001/services/endpoints/routes \
+  --data "paths[]=/messages" \
+  --data "protocols[]=http" \
+  --data "protocols[]=https" \
+  --data name=endpoints
+## FINISH Back-end Endpoint config
 
 echo "Kong configuration completed!"
