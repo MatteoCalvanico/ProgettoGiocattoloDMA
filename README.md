@@ -19,6 +19,6 @@ This project aims to simulate a full stack application with a level architecture
 
 ### Used Lib
 - Mongoose: used for MongoDB interactions.
-- Fortification: used for endpoints.
+- Fastify: used for endpoints.
 - Mqtt.js: used for RabbitMQ interactions.
 - Zod: used for validate endpoint params.
