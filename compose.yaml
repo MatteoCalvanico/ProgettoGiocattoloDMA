@@ -8,16 +8,11 @@ services:
       - mongo_data:/data/db
     restart: unless-stopped
     networks:
-      - app_network
+      - backend_network # Connessione esclusivamente con BE
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    #command: |
-    #  bash -c "
-    #  rabbitmq-plugins enable rabbitmq_mqtt rabbitmq_web_mqtt &&
-    #  rabbitmq-server
-    #  "
     ports:
       - "1885:1883"  # MQTT
       - "5672:5672"  # AMQP
@@ -32,7 +27,7 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
     restart: unless-stopped
     networks:
-      - app_network
+      - shared_network # Connessione con Kong e BE
 
   backend:
     build:
@@ -53,7 +48,8 @@ services:
     - RABBITMQ_PASSWORD=guest
     restart: unless-stopped
     networks:
-      - app_network
+      - backend_network # Connessione con Mongo
+      - shared_network  # Connessione con Kong e RabbitMQ
 
   frontend:
     build:
@@ -66,7 +62,7 @@ services:
       - backend
     restart: unless-stopped
     networks:
-      - app_network
+      - frontend_network # Connessione esclusivamente con Kong
     environment:
     - REACT_APP_API_URL=http://localhost:8080
     - REACT_APP_MQTT_HOST=localhost
@@ -86,7 +82,7 @@ services:
     volumes:
       - kong_data:/var/lib/postgresql/data
     networks:
-      - app_network
+      - kong_network # Connessione esclusiva per servizi Kong
     restart: unless-stopped
     
   kong-migrations:
@@ -101,7 +97,7 @@ services:
       - KONG_PG_USER=kong
       - KONG_PG_PASSWORD=kongpass
     networks:
-      - app_network
+      - kong_network # Connessione esclusiva per servizi Kong
     restart: on-failure
 
   kong:
@@ -127,7 +123,9 @@ services:
       - "8443:8443" # Kong proxy SSL
       - "8444:8444" # Kong Admin API SSL
     networks:
-      - app_network
+      - frontend_network # Connessione con FE
+      - shared_network   # Connessione con RabbitMQ e BE
+      - kong_network     # Connessione esclusiva per servizi Kong
     restart: unless-stopped
   
   kong-setup:
@@ -139,11 +137,19 @@ services:
       - ./kong-setup.sh:/kong-setup.sh
     command: sh -c "apk add --no-cache curl && chmod +x /kong-setup.sh && sh /kong-setup.sh" #Aggiungiamo curl, mettiamo i permessi di esecuzione e facciamo partire lo script di inizializzazione
     networks:
-      - app_network
+      - frontend_network # Connessione con FE
+      - shared_network   # Connessione con BE e RabbitMQ (deve creare service e route)
+      - kong_network     # Connessione esclusiva per servizi Kong
     restart: on-failure
 
 networks:
-  app_network:
+  frontend_network:
+    driver: bridge
+  backend_network:
+    driver: bridge
+  shared_network:
+    driver: bridge
+  kong_network:
     driver: bridge
 
 volumes:
