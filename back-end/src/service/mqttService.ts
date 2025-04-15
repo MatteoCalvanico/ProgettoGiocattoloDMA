@@ -4,6 +4,7 @@ import { mongoRepo } from "../repository/mongoRepository";
 
 export class mqttService {
   client: mqtt.MqttClient;
+  mongo: mongoRepo = new mongoRepo();
 
   private host: string = process.env.MQTT_HOST || "localhost";
   private socketPort: string = process.env.MQTT_WS_PORT || "15675";
@@ -43,9 +44,8 @@ export class mqttService {
 
   /**
    * Legge continuamente da subscriber e salva in MongoDB
-   * @param mongo Repository da usare per salvare su MongoDB
    */
-  save(mongo: mongoRepo) {
+  save() {
     if (this.flag) {
       console.log("Message handler already registered");
       return;
@@ -64,7 +64,10 @@ export class mqttService {
       console.log("Message:", message.toString());
 
       try {
-        await mongo.saveSeries(topic, message.toString());
+        await this.mongo.saveSeries({
+          topic: topic,
+          payload: message.toString(),
+        });
         console.log("Message saved successfully");
       } catch (error) {
         console.log("Errore in scrittura:", error);

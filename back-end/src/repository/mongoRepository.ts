@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 import { Message, MessageSeries } from "../model/schema";
 
 export class mongoRepo {
-  constructor(mongoUrl: string) {
+  constructor() {
     mongoose
-      .connect(mongoUrl)
+      .connect(process.env.MONGO_URL || "mongodb://localhost:27017/projectOne")
       .then(() => console.log("Connection to MongoDB succedes"))
       .catch((err) => console.error("Errore di connessione a MongoDB:", err));
   }
 
-  async save(topic: string, payload: string) {
+  async save({ topic, payload }: { topic: string; payload: string }) {
     const newMsg = new Message({
       topic: topic,
       payload: payload,
@@ -19,7 +19,7 @@ export class mongoRepo {
     await newMsg.save();
   }
 
-  async saveSeries(topic: string, payload: string) {
+  async saveSeries({ topic, payload }: { topic: string; payload: string }) {
     const newSeries = new MessageSeries({
       metadata: { topic, payload },
     });

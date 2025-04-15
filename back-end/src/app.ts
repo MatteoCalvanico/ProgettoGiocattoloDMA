@@ -6,14 +6,8 @@ const fastify = Fastify({
   logger: true,
 });
 
-// Connessione a MongoDB con Mongoose
-//const mongoUrl = "mongodb://localhost:27017/projectOne";
-const mongoUrl =
-  process.env.MONGO_URL || "mongodb://localhost:27017/projectOne";
-const mongoRepository = new mongoRepo(mongoUrl);
-
 // Inizializzazione controller
-const c = new controller(mongoRepository);
+const c = new controller(new mongoRepo());
 
 // Rotta per prendere tutti i messaggi
 fastify.get("/", (req, reply) => c.findAll(req, reply, true));
