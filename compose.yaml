@@ -2,8 +2,8 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    ports:
-      - "27017:27017"
+    #ports:
+    #  - "27017:27017"
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
@@ -13,11 +13,11 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    ports:
-      - "1885:1883" # MQTT
-      - "5672:5672" # AMQP
-      - "15672:15672" # Management UI
-      - "15675:15675" # MQTT over WebSocket
+    #ports:
+    #  - "1885:1883" # MQTT
+    #  - "5672:5672" # AMQP
+    #  - "15672:15672" # Management UI
+    #  - "15675:15675" # MQTT over WebSocket
     volumes:
       - ./rabbitmq/data:/var/lib/rabbitmq
       - ./rabbitmq/logs:/var/log/rabbitmq
@@ -34,8 +34,8 @@ services:
       context: ./back-end
       dockerfile: Dockerfile
     container_name: backend
-    ports:
-      - "8080:8080"
+    #ports:
+    #  - "8080:8080"
     depends_on:
       - mongodb
       - rabbitmq
