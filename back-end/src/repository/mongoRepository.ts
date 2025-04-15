@@ -31,7 +31,7 @@ export class mongoRepo {
    * Trova i valori all'interno del db
    * @param param Parametri su cui cercare, lasciare null se si necessità di ottenere tutti i messaggi
    */
-  async find(param?: Object) {
+  async find(param?: object) {
     console.log("Searching...");
     if (param == null) {
       const results = await Message.find({});
@@ -50,7 +50,7 @@ export class mongoRepo {
     return results;
   }
 
-  async findSeries(param?: Object) {
+  async findSeries(param?: object) {
     console.log("Searching...");
     if (param == null) {
       const results = await MessageSeries.find({});
