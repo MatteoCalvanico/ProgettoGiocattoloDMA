@@ -3,71 +3,74 @@ import mqtt from "mqtt";
 import { mongoRepo } from "../repository/mongoRepository";
 
 export class mqttService {
-    client: mqtt.MqttClient
+  client: mqtt.MqttClient;
 
-    private host: string = process.env.MQTT_HOST || 'localhost';
-    private socketPort: string = process.env.MQTT_WS_PORT || '15675';
-    private mqttPort: string = process.env.MQTT_PORT || '1883';
+  private host: string = process.env.MQTT_HOST || "localhost";
+  private socketPort: string = process.env.MQTT_WS_PORT || "15675";
+  private mqttPort: string = process.env.MQTT_PORT || "1883";
 
-    private socketConnectUrl: string = `ws://${this.host}:${this.socketPort}/ws`;
-    private mqttConnectUrl: string = `mqtt://${this.host}:${this.mqttPort}`;
+  private socketConnectUrl: string = `ws://${this.host}:${this.socketPort}/ws`;
+  private mqttConnectUrl: string = `mqtt://${this.host}:${this.mqttPort}`;
 
-    private clientId: string = `mqtt_${Math.random().toString(16).slice(3)}`;
-    private flag = false; // Evita che ad ogni riconnessione venga ricreato un handler
+  private clientId: string = `mqtt_${Math.random().toString(16).slice(3)}`;
+  private flag = false; // Evita che ad ogni riconnessione venga ricreato un handler
 
-    constructor(withSocket: boolean) {
-        this.client = mqtt.connect(withSocket ? this.socketConnectUrl : this.mqttConnectUrl, {
-          clientId: this.clientId,
-          clean: true,
-          connectTimeout: 4000,
-          // RabbitMQ credentials
-          username: process.env.RABBITMQ_USER || 'guest',
-          password: process.env.RABBITMQ_PASSWORD || 'guest',
-          reconnectPeriod: 1000
-        });
-    }
+  constructor(withSocket: boolean) {
+    this.client = mqtt.connect(
+      withSocket ? this.socketConnectUrl : this.mqttConnectUrl,
+      {
+        clientId: this.clientId,
+        clean: true,
+        connectTimeout: 4000,
+        // RabbitMQ credentials
+        username: process.env.RABBITMQ_USER || "guest",
+        password: process.env.RABBITMQ_PASSWORD || "guest",
+        reconnectPeriod: 1000,
+      }
+    );
+  }
 
-    connect(topic: string) {
-        console.log("Connection...")
-        this.client.on('connect', () => {
-            this.client.subscribe(topic, { qos: 2 }, (err) => {
-                if (!err) {
-                    console.log(`Subscribed to '${topic}'`);
-                }
-            });
-        });
-    }
-
-    /**
-     * Legge continuamente da subscriber e salva in MongoDB
-     * @param mongo Repository da usare per salvare su MongoDB
-     */
-    save(mongo: mongoRepo) {
-        if (this.flag) {
-            console.log("Message handler already registered");
-            return;
+  connect(topic: string) {
+    console.log("Connection...");
+    this.client.on("connect", () => {
+      this.client.subscribe(topic, { qos: 2 }, (err) => {
+        if (!err) {
+          console.log(`Subscribed to '${topic}'`);
         }
-        
-        if(!this.client.connected) {
-            console.log("Connect first");
-            return;
-        }
-        
-        // Rimuoviamo altri "handler", per evitare che i messaggi vengano duplicati
-        this.client.removeAllListeners('message');
-        
-        this.client.on('message', async (topic, message) => {
-            console.log('Received message on topic:', topic);
-            console.log('Message:', message.toString());
+      });
+    });
+  }
 
-            try {
-                await mongo.saveSeries(topic, message.toString());
-                console.log('Message saved successfully');
-            } catch (error) {
-                console.log('Errore in scrittura:', error);
-            }
-        });
-        
-        this.flag = true;
+  /**
+   * Legge continuamente da subscriber e salva in MongoDB
+   * @param mongo Repository da usare per salvare su MongoDB
+   */
+  save(mongo: mongoRepo) {
+    if (this.flag) {
+      console.log("Message handler already registered");
+      return;
     }
+
+    if (!this.client.connected) {
+      console.log("Connect first");
+      return;
+    }
+
+    // Rimuoviamo altri "handler", per evitare che i messaggi vengano duplicati
+    this.client.removeAllListeners("message");
+
+    this.client.on("message", async (topic, message) => {
+      console.log("Received message on topic:", topic);
+      console.log("Message:", message.toString());
+
+      try {
+        await mongo.saveSeries(topic, message.toString());
+        console.log("Message saved successfully");
+      } catch (error) {
+        console.log("Errore in scrittura:", error);
+      }
+    });
+
+    this.flag = true;
+  }
 }
