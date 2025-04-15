@@ -8,12 +8,17 @@
     "start-sub": "node dist/subscriber.js",
     "start-api": "node dist/app.js",
     "sub": "npm run build && npm run start-sub",
-    "app": "npm run build && npm run start-api"
+    "app": "npm run build && npm run start-api",
+    "dev:sub": "nodemon --watch 'src/**/*.ts' --exec npx ts-node src/subscriber.ts",
+    "dev:app": "nodemon --watch 'src/**/*.ts' --exec npx ts-node src/app.ts",
+    "dev": "npm run dev:sub & npm run dev:app"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
