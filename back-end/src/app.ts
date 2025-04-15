@@ -16,12 +16,10 @@ const mongoRepository = new mongoRepo(mongoUrl);
 const c = new controller(mongoRepository);
 
 // Rotta per prendere tutti i messaggi
-fastify.get("/all", (req, reply) => c.findAll(req, reply, true));
+fastify.get("/", (req, reply) => c.findAll(req, reply, true));
 
 // Rotta per cercare messaggi per timestamp
-fastify.get("/findByTimestamp/:timestamp", (req, reply) =>
-  c.findStamp(req, reply, true)
-);
+fastify.get("/:timestamp", (req, reply) => c.findStamp(req, reply, true));
 
 // Listener per request
 fastify.listen({ port: 8080, host: "0.0.0.0" }, function (err, address) {
