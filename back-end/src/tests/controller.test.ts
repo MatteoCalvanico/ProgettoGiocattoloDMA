@@ -1,23 +1,21 @@
 import { controller } from "../controller/controller";
-import { mongoRepo } from "../repository/mongoRepository";
+import { MessageHandler } from "../handlers/messages";
 
-// Mock mongoRepo
-jest.mock("../repository/mongoRepository", () => ({
-  mongoRepo: jest.fn().mockImplementation(() => ({
-    findSeries: jest.fn().mockResolvedValue([{ id: 1, data: "test data" }]),
-    findSeriesByTimestamp: jest
+// Mock MessageHandler
+jest.mock("../handlers/messages", () => ({
+  MessageHandler: jest.fn().mockImplementation(() => ({
+    findAllMessages: jest
+      .fn()
+      .mockResolvedValue([{ id: 1, data: "test data" }]),
+    findByStamp: jest
       .fn()
       .mockResolvedValue([{ id: 1, timestamp: "2023-01-01T00:00:00Z" }]),
-    find: jest.fn().mockResolvedValue([{ id: 2, data: "regular data" }]),
-    findByTimestamp: jest
-      .fn()
-      .mockResolvedValue([{ id: 2, timestamp: "2023-01-01T00:00:00Z" }]),
   })),
 }));
 
 describe("Controller tests:", () => {
   let testController: controller;
-  let mockRepo: mongoRepo;
+  let mockHandler: MessageHandler;
 
   // Mock dei request e dei reply
   const mockRequest = {
@@ -30,29 +28,27 @@ describe("Controller tests:", () => {
   } as any;
 
   beforeEach(() => {
-    mockRepo = new mongoRepo();
-    testController = new controller(mockRepo);
+    mockHandler = new MessageHandler(null as any); // Stiamo testando il controller, non abbiamo bisogno di passare effettivamente nulla
+    testController = new controller(mockHandler);
     jest.clearAllMocks();
   });
 
   describe("findAll", () => {
-    test("should return timeseries data when isSeries is true", async () => {
+    test("should return messages when findAll is called", async () => {
       await testController.findAll(mockRequest, mockReply, true);
 
-      expect(mockRepo.findSeries).toHaveBeenCalled();
-      expect(mockRepo.find).not.toHaveBeenCalled(); // L'altro metodo NON deve essere chiamato
+      expect(mockHandler.findAllMessages).toHaveBeenCalledWith(true);
       expect(mockReply.send).toHaveBeenCalledWith({
         messages: [{ id: 1, data: "test data" }],
       });
     });
 
-    test("shouldn't return timeseries data when isSeries si true", async () => {
+    test("should pass isSeries=false to handler", async () => {
       await testController.findAll(mockRequest, mockReply, false);
 
-      expect(mockRepo.find).toHaveBeenCalled();
-      expect(mockRepo.findSeries).not.toHaveBeenCalled(); // L'altro metodo NON deve essere chiamato
+      expect(mockHandler.findAllMessages).toHaveBeenCalledWith(false);
       expect(mockReply.send).toHaveBeenCalledWith({
-        messages: [{ id: 2, data: "regular data" }],
+        messages: [{ id: 1, data: "test data" }],
       });
     });
   });
@@ -62,27 +58,27 @@ describe("Controller tests:", () => {
       mockRequest.params = { timestamp: "2023-01-01T00:00:00Z" };
     });
 
-    test("should return timeseries data by timestamp when isSeries is true", async () => {
+    test("should find message by timestamp when isSeries is true", async () => {
       await testController.findStamp(mockRequest, mockReply, true);
 
-      expect(mockRepo.findSeriesByTimestamp).toHaveBeenCalledWith(
+      expect(mockHandler.findByStamp).toHaveBeenCalledWith(
+        true,
         "2023-01-01T00:00:00Z"
       );
-      expect(mockRepo.findByTimestamp).not.toHaveBeenCalled();
       expect(mockReply.send).toHaveBeenCalledWith({
         message: [{ id: 1, timestamp: "2023-01-01T00:00:00Z" }],
       });
     });
 
-    test("shouldn't return timeseries data by timestamp when isSeries is false", async () => {
+    test("should find message by timestamp when isSeries is false", async () => {
       await testController.findStamp(mockRequest, mockReply, false);
 
-      expect(mockRepo.findByTimestamp).toHaveBeenCalledWith(
+      expect(mockHandler.findByStamp).toHaveBeenCalledWith(
+        false,
         "2023-01-01T00:00:00Z"
       );
-      expect(mockRepo.findSeriesByTimestamp).not.toHaveBeenCalled();
       expect(mockReply.send).toHaveBeenCalledWith({
-        message: [{ id: 2, timestamp: "2023-01-01T00:00:00Z" }],
+        message: [{ id: 1, timestamp: "2023-01-01T00:00:00Z" }],
       });
     });
 

@@ -1,12 +1,12 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { mongoRepo } from "../repository/mongoRepository";
 import { z } from "zod";
+import { MessageHandler } from "../handlers/messages";
 
 export class controller {
-  private mongoRepository: mongoRepo;
+  private handler: MessageHandler;
 
-  constructor(mongoRepos: mongoRepo) {
-    this.mongoRepository = mongoRepos;
+  constructor(handler: MessageHandler) {
+    this.handler = handler;
   }
 
   async findAll(
@@ -15,9 +15,7 @@ export class controller {
     isSeries: boolean
   ) {
     try {
-      const messages = isSeries
-        ? await this.mongoRepository.findSeries()
-        : await this.mongoRepository.find();
+      const messages = await this.handler.findAllMessages(isSeries);
       reply.send({ messages });
     } catch (error: any) {
       reply.code(500).send({ success: false, error: error.message });
@@ -32,9 +30,7 @@ export class controller {
     try {
       const { timestamp } = request.params as { timestamp: string };
       z.string().datetime().parse(timestamp);
-      const message = isSeries
-        ? await this.mongoRepository.findSeriesByTimestamp(timestamp)
-        : await this.mongoRepository.findByTimestamp(timestamp);
+      const message = await this.handler.findByStamp(isSeries, timestamp);
       reply.send({ message });
     } catch (error: any) {
       reply.code(500).send({ success: false, error: error.message });

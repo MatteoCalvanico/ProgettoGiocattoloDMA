@@ -5,6 +5,7 @@ import Fastify, {
 } from "fastify";
 import { mongoRepo } from "./repository/mongoRepository";
 import { controller } from "./controller/controller";
+import { MessageHandler } from "./handlers/messages";
 
 // Funzione che crea e configura l'app
 export function buildApp() {
@@ -13,7 +14,7 @@ export function buildApp() {
   }) as FastifyInstance;
 
   // Inizializzazione controller
-  const c = new controller(new mongoRepo());
+  const c = new controller(new MessageHandler(new mongoRepo()));
 
   // Rotta per prendere tutti i messaggi
   fastify.get("/", (req: FastifyRequest, reply: FastifyReply) =>
