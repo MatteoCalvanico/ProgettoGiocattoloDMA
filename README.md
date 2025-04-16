@@ -32,6 +32,7 @@ This project aims to simulate a full stack application with a level architecture
 - Mqtt.js: used for RabbitMQ interactions.
 - Zod: used for validate endpoint params.
 - Eslint: used as a lint (you can use it with the command 'npx eslint .').
+- Jest: used for testing the back-end (you can start the test with 'npm jest' and generate/view the coverage with 'npx jest --coverage --coverageDirectory ./cov --coverageProvider v8' )
 
 ## Schema
 
