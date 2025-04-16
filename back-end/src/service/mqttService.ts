@@ -63,15 +63,10 @@ export class mqttService {
       console.log("Received message on topic:", topic);
       console.log("Message:", message.toString());
 
-      try {
-        await this.mongo.saveSeries({
-          topic: topic,
-          payload: message.toString(),
-        });
-        console.log("Message saved successfully");
-      } catch (error) {
-        console.log("Errore in scrittura:", error);
-      }
+      await this.mongo.saveSeries({
+        topic: topic,
+        payload: message.toString(),
+      });
     });
 
     this.flag = true;

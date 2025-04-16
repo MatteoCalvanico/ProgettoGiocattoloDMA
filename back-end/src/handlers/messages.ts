@@ -8,20 +8,12 @@ export class MessageHandler {
   }
 
   async findAllMessages(isSeries: boolean) {
-    try {
-      return isSeries ? await this.mongo.findSeries() : await this.mongo.find();
-    } catch (error: any) {
-      throw new Error(`Failed to fetch messages: ${error.message}`);
-    }
+    return isSeries ? await this.mongo.findSeries() : await this.mongo.find();
   }
 
   async findByStamp(isSeries: boolean, stamp: string) {
-    try {
-      return isSeries
-        ? await this.mongo.findSeriesByTimestamp(stamp)
-        : await this.mongo.findByTimestamp(stamp);
-    } catch (error: any) {
-      throw new Error(`Failed to fetch messages: ${error.message}`);
-    }
+    return isSeries
+      ? await this.mongo.findSeriesByTimestamp(stamp)
+      : await this.mongo.findByTimestamp(stamp);
   }
 }
