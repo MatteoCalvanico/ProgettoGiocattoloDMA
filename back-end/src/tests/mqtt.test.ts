@@ -24,10 +24,6 @@ const mockClient = {
 describe("MQTT tests:", () => {
   let service: mqttService;
 
-  /*beforeAll(() => {
-    service = new mqttService(true);
-  });*/
-
   describe("connect", () => {
     beforeEach(() => {
       service = new mqttService(true);
@@ -90,9 +86,6 @@ describe("MQTT tests:", () => {
 
     test("should save message to MongoDB", async () => {
       service.save();
-
-      console.log("DEBUG: Mongo property:", service.mongo);
-      console.log("DEBUG: saveSeries method:", service.mongo?.saveSeries);
 
       // Prendiamo la call del message e la ri-eseguiamo
       const messageCallback = mockClient.on.mock.calls.find(

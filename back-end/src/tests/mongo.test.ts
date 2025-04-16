@@ -15,14 +15,14 @@ describe("MongoRepository tests:", () => {
   let repository: mongoRepo;
 
   beforeAll(() => {
-    (mongoose.connect as jest.Mock).mockResolvedValue({});
+    (mongoose.connect as jest.Mock).mockResolvedValue({}); // Simuliamo che la connessione con MongoDB sia andata
     repository = new mongoRepo();
   });
 
   describe("MessageSeries:", () => {
     test("should find all message series when no parameters are provided", async () => {
       const mockSeries = [{ metadata: { topic: "test", payload: "data" } }];
-      (MessageSeries.find as jest.Mock).mockResolvedValue(mockSeries);
+      (MessageSeries.find as jest.Mock).mockResolvedValue(mockSeries); // Facciamo ritornare dal .find i nosti dati finti
 
       const result = await repository.findSeries();
 
@@ -32,7 +32,7 @@ describe("MongoRepository tests:", () => {
 
     test("should find messages by timestamp", async () => {
       const mockMessages = [{ timestamp: "2023-01-01T00:00:00Z" }];
-      (MessageSeries.find as jest.Mock).mockResolvedValue(mockMessages);
+      (MessageSeries.find as jest.Mock).mockResolvedValue(mockMessages); // Facciamo ritornare dal .find i nosti dati finti
 
       const result = await repository.findSeriesByTimestamp(
         "2023-01-01T00:00:00Z"
