@@ -9,6 +9,7 @@ jest.mock("mqtt", () => ({
 jest.mock("../repository/mongoRepository", () => ({
   mongoRepo: jest.fn().mockImplementation(() => ({
     saveSeries: jest.fn().mockResolvedValue({}),
+    connect: jest.fn().mockResolvedValue({}),
   })),
 }));
 
@@ -29,8 +30,8 @@ describe("MQTT tests:", () => {
       service = new mqttService(true);
     });
 
-    test("should register connect event handler", () => {
-      service.connect("test/topic");
+    test("should register connect event handler", async () => {
+      await service.connect("test/topic");
       // Controlliamo che venga chiamata sul connect e faccia qualcosa
       expect(mockClient.on).toHaveBeenCalledWith(
         "connect",
@@ -38,16 +39,8 @@ describe("MQTT tests:", () => {
       );
     });
 
-    test("should be subscribe on topic with qos 2", () => {
-      service.connect("test/topic");
-
-      // Non funzionava perchè il subscribe parte solo dopo l'esecuzione del .on
-      /*
-      expect(mockClient.subscribe).toHaveBeenCalledWith(
-        "test/topic",
-        { qos: 2 },
-        expect.any(Function)
-      );*/
+    test("should be subscribe on topic with qos 2", async () => {
+      await service.connect("test/topic");
 
       // Prendiamo la call del connect e la ri-eseguiamo
       const connectCallback = mockClient.on.mock.calls.find(
@@ -65,10 +58,10 @@ describe("MQTT tests:", () => {
   });
 
   describe("save", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       service = new mqttService(true);
-      service.connect("test/topic");
+      await service.connect("test/topic");
     });
 
     test("should remove all handler", () => {
