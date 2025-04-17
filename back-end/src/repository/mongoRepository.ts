@@ -3,11 +3,17 @@ import mongoose from "mongoose";
 import { Message, MessageSeries } from "../model/schema";
 
 export class mongoRepo {
-  constructor() {
+  /*constructor() {
     mongoose
       .connect(process.env.MONGO_URL || "mongodb://localhost:27017/projectOne")
       .then(() => console.log("Connection to MongoDB succedes"))
       .catch((err) => console.error("Errore di connessione a MongoDB:", err));
+  }*/
+
+  async connect() {
+    await mongoose.connect(
+      process.env.MONGO_URL || "mongodb://localhost:27017/projectOne"
+    );
   }
 
   async save({ topic, payload }: { topic: string; payload: string }) {

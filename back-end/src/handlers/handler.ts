@@ -3,10 +3,10 @@ import { z } from "zod";
 import { controller } from "../controller/controller";
 
 export class handler {
-  private handler: controller;
+  private controller: controller;
 
-  constructor(handler: controller) {
-    this.handler = handler;
+  constructor(ctrl: controller) {
+    this.controller = ctrl;
   }
 
   async findAll(
@@ -15,7 +15,7 @@ export class handler {
     isSeries: boolean
   ) {
     try {
-      const messages = await this.handler.findAllMessages(isSeries);
+      const messages = await this.controller.findAllMessages(isSeries);
       reply.send({ messages });
     } catch (error: any) {
       reply.code(500).send({ success: false, error: error.message });
@@ -30,7 +30,7 @@ export class handler {
     try {
       const { timestamp } = request.params as { timestamp: string };
       z.string().datetime().parse(timestamp);
-      const message = await this.handler.findByStamp(isSeries, timestamp);
+      const message = await this.controller.findByStamp(isSeries, timestamp);
       reply.send({ message });
     } catch (error: any) {
       reply.code(500).send({ success: false, error: error.message });

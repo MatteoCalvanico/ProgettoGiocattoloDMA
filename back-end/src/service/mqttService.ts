@@ -31,7 +31,10 @@ export class mqttService {
     );
   }
 
-  connect(topic: string) {
+  async connect(topic: string) {
+    console.log("Connection to DB...");
+    await this.mongo.connect();
+
     console.log("Connection...");
     this.client.on("connect", () => {
       this.client.subscribe(topic, { qos: 2 }, (err) => {

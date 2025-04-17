@@ -12,21 +12,36 @@ export function buildApp() {
   const fastify = Fastify({
     logger: true,
   }) as FastifyInstance;
+  const db = new mongoRepo();
+
+  // Inizializzazione DB
+  initializeDatabase(db);
 
   // Inizializzazione controller
-  const c = new handler(new controller(new mongoRepo()));
+  const h = new handler(new controller(db));
 
   // Rotta per prendere tutti i messaggi
   fastify.get("/", (req: FastifyRequest, reply: FastifyReply) =>
-    c.findAll(req, reply, true)
+    h.findAll(req, reply, true)
   );
 
   // Rotta per cercare messaggi per timestamp
   fastify.get("/:timestamp", (req: FastifyRequest, reply: FastifyReply) =>
-    c.findStamp(req, reply, true)
+    h.findStamp(req, reply, true)
   );
 
   return fastify;
+}
+
+// Inizializza connessione DB
+async function initializeDatabase(mongoRepository: mongoRepo) {
+  try {
+    await mongoRepository.connect();
+    fastify.log.info("Connect to MongoDB");
+  } catch (error: any) {
+    fastify.log.error("Failed to connect to MongoDB:", error);
+    process.exit(1);
+  }
 }
 
 // Crea l'app

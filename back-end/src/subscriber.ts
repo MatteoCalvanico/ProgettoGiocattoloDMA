@@ -4,7 +4,12 @@ import { mqttService } from "./service/mqttService";
 const mqttServ = new mqttService(true);
 
 // Connsessione a Mosquitto con MQTT.js
-mqttServ.connect("projectOneData");
+
+try {
+  mqttServ.connect("projectOneData");
+} catch (error: any) {
+  console.error("Error during connection: ", error);
+}
 
 // Salvataggio messaggi
 mqttServ.client.once("connect", () => {
