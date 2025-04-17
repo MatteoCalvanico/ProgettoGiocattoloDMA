@@ -1,5 +1,5 @@
 import { mongoRepo } from "../repository/mongoRepository";
-import { MessageHandler } from "../handlers/messages";
+import { controller } from "../controller/controller";
 
 // Mock mongoRepo
 jest.mock("../repository/mongoRepository", () => ({
@@ -16,13 +16,13 @@ jest.mock("../repository/mongoRepository", () => ({
 }));
 
 describe("MessageHandler tests:", () => {
-  let handler: MessageHandler;
+  let handler: controller;
   let mongo: mongoRepo;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mongo = new mongoRepo();
-    handler = new MessageHandler(mongo);
+    handler = new controller(mongo);
   });
 
   describe("findAllMessages", () => {

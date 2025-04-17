@@ -1,39 +1,19 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { z } from "zod";
-import { MessageHandler } from "../handlers/messages";
+import { mongoRepo } from "../repository/mongoRepository";
 
 export class controller {
-  private handler: MessageHandler;
+  private mongo: mongoRepo;
 
-  constructor(handler: MessageHandler) {
-    this.handler = handler;
+  constructor(mongo: mongoRepo) {
+    this.mongo = mongo;
   }
 
-  async findAll(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    isSeries: boolean
-  ) {
-    try {
-      const messages = await this.handler.findAllMessages(isSeries);
-      reply.send({ messages });
-    } catch (error: any) {
-      reply.code(500).send({ success: false, error: error.message });
-    }
+  async findAllMessages(isSeries: boolean) {
+    return isSeries ? await this.mongo.findSeries() : await this.mongo.find();
   }
 
-  async findStamp(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    isSeries: boolean
-  ) {
-    try {
-      const { timestamp } = request.params as { timestamp: string };
-      z.string().datetime().parse(timestamp);
-      const message = await this.handler.findByStamp(isSeries, timestamp);
-      reply.send({ message });
-    } catch (error: any) {
-      reply.code(500).send({ success: false, error: error.message });
-    }
+  async findByStamp(isSeries: boolean, stamp: string) {
+    return isSeries
+      ? await this.mongo.findSeriesByTimestamp(stamp)
+      : await this.mongo.findByTimestamp(stamp);
   }
 }
