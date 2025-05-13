@@ -1,9 +1,7 @@
 import { mqttService } from "./service/mqttService";
 
-// Configurazione per il broker Mosquitto
+// Configurazione per il broker RabbitMQ
 const mqttServ = new mqttService(true);
-
-// Connsessione a Mosquitto con MQTT.js
 
 try {
   mqttServ.connect("projectOneData");
